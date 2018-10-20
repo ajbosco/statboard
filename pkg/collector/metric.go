@@ -2,8 +2,9 @@ package collector
 
 import "time"
 
-type metric struct {
-	Source string
-	Date   time.Time
-	Value  float64
+// Metric contains information about metrics
+type Metric struct {
+	Name  string
+	Date  time.Time
+	Value float64
 }
