@@ -6,7 +6,7 @@ TARGET := ${BUILD_DIR}/${NAME}
 
 .PHONY: build
 build: ## run go build for current OS
-	@go build -ldflags "$(LDFLAGS)" -o "${TARGET}" ${PKG}
+	@go build --mod=vendor -ldflags "$(LDFLAGS)" -o "${TARGET}" ${PKG}
 
 .PHONY: clean
 clean: ## Cleanup any build binaries or packages.
