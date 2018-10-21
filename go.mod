@@ -1,6 +1,7 @@
 module github.com/ajbosco/statboard
 
 require (
+	github.com/asdine/storm v2.1.2+incompatible
 	github.com/etcd-io/bbolt v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
@@ -10,6 +11,7 @@ require (
 	github.com/spf13/viper v1.2.1
 	github.com/stretchr/testify v1.2.2
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
+	go.etcd.io/bbolt v1.3.0 // indirect
 	golang.org/x/image v0.0.0-20180926015637-991ec62608f3 // indirect
 	golang.org/x/net v0.0.0-20181017193950-04a2e542c03f // indirect
 	golang.org/x/oauth2 v0.0.0-20181017192945-9dcd33a902f4 // indirect

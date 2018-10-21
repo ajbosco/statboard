@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ajbosco/statboard/pkg/statboard"
+	"github.com/ajbosco/statboard/pkg/config"
+	"github.com/ajbosco/statboard/pkg/metric"
 	"github.com/pkg/errors"
 	"github.com/sajal/fitbitclient"
-	"github.com/spf13/viper"
 )
 
 var _ Collector = &FitbitCollector{}
@@ -28,33 +28,24 @@ type FitbitCollector struct {
 }
 
 // NewFitbitCollector parses config file and creates a new FitbitCollector
-func NewFitbitCollector(configFilePath string) (*FitbitCollector, error) {
-	viper.SetConfigFile(configFilePath)
-	err := viper.ReadInConfig()
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("could not read config; filepath:%q", configFilePath))
-	}
-
-	clientID := viper.GetString("fitbit.client_id")
-	if clientID == "" {
+func NewFitbitCollector(cfg config.Config) (*FitbitCollector, error) {
+	if cfg.Fitbit.ClientID == "" {
 		return nil, errors.New("'fitbit.client_id' must be present in config")
 	}
-	clientSecret := viper.GetString("fitbit.client_secret")
-	if clientSecret == "" {
+	if cfg.Fitbit.ClientSecret == "" {
 		return nil, errors.New("'fitbit.client_secret' must be present in config")
 	}
-	cacheFile := viper.GetString("fitbit.cache_file")
-	if cacheFile == "" {
+	if cfg.Fitbit.CacheFile == "" {
 		return nil, errors.New("'fitbit.cache_file' must be present in config")
 	}
 
-	cfg := &fitbitclient.Config{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
+	clientCfg := &fitbitclient.Config{
+		ClientID:     cfg.Fitbit.ClientID,
+		ClientSecret: cfg.Fitbit.ClientSecret,
 		Scopes:       []string{"activity"},
-		CredFile:     cacheFile,
+		CredFile:     cfg.Fitbit.CacheFile,
 	}
-	client, err := fitbitclient.NewFitBitClient(cfg)
+	client, err := fitbitclient.NewFitBitClient(clientCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create fitbit client")
 	}
@@ -63,23 +54,23 @@ func NewFitbitCollector(configFilePath string) (*FitbitCollector, error) {
 }
 
 // Collect returns metric from Fitbit API
-func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]statboard.Metric, error) {
-	var m []statboard.Metric
+func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]metric.Metric, error) {
+	var m []metric.Metric
 	var err error
 
 	switch metricName {
 	case "steps":
 		m, err = c.getSteps(daysBack)
 	default:
-		err = fmt.Errorf("Unsupported metric: %s", metricName)
+		err = fmt.Errorf("unsupported metric: %s", metricName)
 	}
 
 	return m, err
 }
 
-func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
+func (c *FitbitCollector) getSteps(daysBack int) ([]metric.Metric, error) {
 	var a FitbitActivities
-	var m []statboard.Metric
+	var m []metric.Metric
 
 	end := time.Now().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
@@ -104,7 +95,7 @@ func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
 			return nil, errors.Wrap(err, "converting steps to float failed")
 		}
 
-		met := statboard.Metric{
+		met := metric.Metric{
 			Name:  "fitbit.steps",
 			Date:  dt,
 			Value: v,

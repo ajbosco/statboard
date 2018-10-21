@@ -4,79 +4,79 @@ import (
 	"fmt"
 
 	"github.com/ajbosco/statboard/pkg/collector"
-	"github.com/ajbosco/statboard/pkg/store"
+	"github.com/ajbosco/statboard/pkg/config"
+	"github.com/ajbosco/statboard/pkg/metric"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-// Config contains environment variables for the metric collector
-type Config struct {
+// EnvConfig contains environment variables for the metric collector
+type EnvConfig struct {
 	ConfigFilePath string `required:"true"`
 }
 
 func main() {
-	var cfg Config
-	err := envconfig.Process("statboard", &cfg)
+	var envCfg EnvConfig
+	err := envconfig.Process("statboard", &envCfg)
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
 
-	viper.SetConfigFile(cfg.ConfigFilePath)
+	viper.SetConfigFile(envCfg.ConfigFilePath)
 	err = viper.ReadInConfig()
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	// Check for required config parameters
-	dbFilePath := viper.GetString("db.file_path")
-	if dbFilePath == "" {
-		logrus.Fatal(errors.New("'db.file_path' must be present in config"))
-	}
-	metrics := viper.GetStringMapStringSlice("metrics")
-	if metrics == nil {
-		logrus.Fatal(errors.New("'metrics' must be present in config"))
+	var cfg config.Config
+
+	err = viper.Unmarshal(&cfg)
+	if err != nil {
+		logrus.Fatal(err)
 	}
 
-	// Create statboard store
-	s, err := store.NewBoltStore(dbFilePath)
+	// Create metric store
+	s, err := metric.NewStormStore(cfg.Db.FilePath)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	// Create collectors
-	for k, v := range metrics {
-		c, err := createCollector(k, cfg.ConfigFilePath)
+	for metType, metCfgs := range cfg.Metrics {
+		c, err := createCollector(metType, cfg)
 		if err != nil {
 			logrus.Fatal(err)
 		}
 
 		// Collect and write metrics
-		for _, m := range v {
-			metrics, err := c.Collect(m, 10)
+		for metName, metCfg := range metCfgs {
+			metricName := fmt.Sprintf("%s.%s", metType, metName)
+			metrics, err := c.Collect(metName, metCfg.DaysBack)
 			if err != nil {
-				logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to collect metric:%q", m)))
+				logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to collect metric:%q", metricName)))
 			}
+			logrus.Info(fmt.Sprintf("collected %d %q records", len(metrics), metricName))
 
 			for _, met := range metrics {
 				err = s.WriteMetric(met)
 				if err != nil {
-					logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to write metric:%q", m)))
+					logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to write metric:%q", metricName)))
 				}
 			}
-
+			logrus.Info(fmt.Sprintf("wrote %d %q records to database", len(metrics), metricName))
 		}
 	}
 }
 
-func createCollector(collectorType string, cfgFilePath string) (collector.Collector, error) {
+func createCollector(collectorType string, cfg config.Config) (collector.Collector, error) {
 	var c collector.Collector
 	var err error
 
 	switch collectorType {
 	case "fitbit":
-		c, err = collector.NewFitbitCollector(cfgFilePath)
+		c, err = collector.NewFitbitCollector(cfg)
 	default:
 		err = fmt.Errorf("Unsupported collector type:%q", collectorType)
 	}

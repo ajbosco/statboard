@@ -7,13 +7,18 @@ import (
 	"os"
 	"time"
 
-	"github.com/ajbosco/statboard/pkg/statboard"
+	"github.com/ajbosco/statboard/pkg/metric"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	chart "github.com/wcharczuk/go-chart"
+	"github.com/wcharczuk/go-chart/drawing"
 )
 
 // RenderChart formats the Statboard metrics and renders a go-chart time series plot
-func RenderChart(name string, filePath string, metrics []statboard.Metric) error {
+func RenderChart(name string, chartColor string, filePath string, metrics []metric.Metric) error {
+	if len(metrics) <= 1 {
+		return fmt.Errorf("time series charts require more than 1 value, only found %d. collect more data", len(metrics))
+	}
 	var series []chart.Series
 	var x []time.Time
 	var y []float64
@@ -23,14 +28,20 @@ func RenderChart(name string, filePath string, metrics []statboard.Metric) error
 		y = append(y, met.Value)
 	}
 
-	series = append(series, chart.TimeSeries{
+	ts := chart.TimeSeries{
 		Style: chart.Style{
 			Show:        true,
-			StrokeColor: chart.GetDefaultColor(0),
+			StrokeColor: drawing.ColorFromHex(chartColor),
+			FillColor:   drawing.ColorFromHex(chartColor),
 		},
 		XValues: x,
 		YValues: y,
-	})
+	}
+	if err := ts.Validate(); err != nil {
+		return errors.Wrap(err, "invalid time series chart")
+	}
+
+	series = append(series, ts)
 
 	fileName := fmt.Sprintf("%v-chart.png", name)
 
@@ -62,6 +73,7 @@ func writeChart(c chart.Chart, filePath string, fileName string) error {
 	if err := ioutil.WriteFile(fullPath, buf.Bytes(), 0644); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to write chart to filePath:%q", fullPath))
 	}
+	logrus.Info(fmt.Sprintf("chart written to %q", fullPath))
 
 	return nil
 }
