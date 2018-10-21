@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"time"
 
-	"github.com/ajbosco/statboard/pkg/collector"
+	"github.com/ajbosco/statboard/pkg/reporter"
 	"github.com/ajbosco/statboard/pkg/store"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
@@ -30,6 +30,10 @@ func main() {
 	}
 
 	// Check for required config parameters
+	filePath := viper.GetString("charts.file_path")
+	if filePath == "" {
+		logrus.Fatal(errors.New("'charts.file_path' must be present in config"))
+	}
 	dbFilePath := viper.GetString("db.file_path")
 	if dbFilePath == "" {
 		logrus.Fatal(errors.New("'db.file_path' must be present in config"))
@@ -45,40 +49,17 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	// Create collectors
-	for k, v := range metrics {
-		c, err := createCollector(k, cfg.ConfigFilePath)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-		// Collect and write metrics
+	// Render charts for all metrics
+	for _, v := range metrics {
 		for _, m := range v {
-			metrics, err := c.Collect(m, 10)
+			met, err := s.GetMetric(m, time.Now().AddDate(0, 0, -10))
 			if err != nil {
-				logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to collect metric:%q", m)))
+				logrus.Fatal(err)
 			}
 
-			for _, met := range metrics {
-				err = s.WriteMetric(met)
-				if err != nil {
-					logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to write metric:%q", m)))
-				}
+			if err := reporter.RenderChart(m, filePath, met); err != nil {
+				logrus.Fatal(err)
 			}
-
 		}
 	}
-}
-
-func createCollector(collectorType string, cfgFilePath string) (collector.Collector, error) {
-	var c collector.Collector
-	var err error
-
-	switch collectorType {
-	case "fitbit":
-		c, err = collector.NewFitbitCollector(cfgFilePath)
-	default:
-		err = fmt.Errorf("Unsupported collector type:%q", collectorType)
-	}
-	return c, err
 }

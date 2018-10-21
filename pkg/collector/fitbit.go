@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ajbosco/statboard/pkg/statboard"
 	"github.com/pkg/errors"
 	"github.com/sajal/fitbitclient"
 	"github.com/spf13/viper"
@@ -29,7 +30,6 @@ type FitbitCollector struct {
 // NewFitbitCollector parses config file and creates a new FitbitCollector
 func NewFitbitCollector(configFilePath string) (*FitbitCollector, error) {
 	viper.SetConfigFile(configFilePath)
-	viper.SetConfigType("toml")
 	err := viper.ReadInConfig()
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("could not read config; filepath:%q", configFilePath))
@@ -63,8 +63,8 @@ func NewFitbitCollector(configFilePath string) (*FitbitCollector, error) {
 }
 
 // Collect returns metric from Fitbit API
-func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]Metric, error) {
-	var m []Metric
+func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]statboard.Metric, error) {
+	var m []statboard.Metric
 	var err error
 
 	switch metricName {
@@ -77,9 +77,9 @@ func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]Metric, er
 	return m, err
 }
 
-func (c *FitbitCollector) getSteps(daysBack int) ([]Metric, error) {
+func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
 	var a FitbitActivities
-	var m []Metric
+	var m []statboard.Metric
 
 	end := time.Now().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
@@ -104,7 +104,7 @@ func (c *FitbitCollector) getSteps(daysBack int) ([]Metric, error) {
 			return nil, errors.Wrap(err, "converting steps to float failed")
 		}
 
-		met := Metric{
+		met := statboard.Metric{
 			Name:  "fitbit.steps",
 			Date:  dt,
 			Value: v,
@@ -119,7 +119,6 @@ func (c *FitbitCollector) getSteps(daysBack int) ([]Metric, error) {
 func doRequest(client *http.Client, baseURI string, endpoint string) ([]byte, error) {
 	// Create the request.
 	uri := fmt.Sprintf("%s/%s", baseURI, strings.Trim(endpoint, "/"))
-	fmt.Println(uri)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("creating request to %s failed", uri))

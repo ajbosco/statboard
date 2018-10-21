@@ -1,4 +1,4 @@
-package collector
+package store
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ajbosco/statboard/pkg/statboard"
 	bolt "github.com/etcd-io/bbolt"
 	"github.com/pkg/errors"
 )
@@ -16,8 +17,8 @@ const (
 
 // Store represents the store that writes and reads metrics
 type Store interface {
-	GetMetric(metricName string, since time.Time) ([]Metric, error)
-	WriteMetric(m Metric) error
+	GetMetric(metricName string, since time.Time) ([]statboard.Metric, error)
+	WriteMetric(m statboard.Metric) error
 	Close() error
 }
 
@@ -48,7 +49,7 @@ func NewBoltStore(filePath string) (Store, error) {
 }
 
 // WriteMetric inserts or updates metric in database
-func (b *boltStore) WriteMetric(m Metric) error {
+func (b *boltStore) WriteMetric(m statboard.Metric) error {
 	key := fmt.Sprintf("%s-%s", m.Date, m.Name)
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
@@ -64,8 +65,8 @@ func (b *boltStore) WriteMetric(m Metric) error {
 }
 
 // GetMetric returns the metrics since the given date
-func (b *boltStore) GetMetric(metricName string, since time.Time) ([]Metric, error) {
-	var metrics []Metric
+func (b *boltStore) GetMetric(metricName string, since time.Time) ([]statboard.Metric, error) {
+	var metrics []statboard.Metric
 	key := fmt.Sprintf("%s-%s", since, metricName)
 
 	err := b.db.View(func(tx *bolt.Tx) error {
@@ -79,7 +80,7 @@ func (b *boltStore) GetMetric(metricName string, since time.Time) ([]Metric, err
 		search := []byte(key)
 
 		for k, v := c.Seek(search); k != nil; k, v = c.Next() {
-			met := Metric{}
+			met := statboard.Metric{}
 			dec := gob.NewDecoder(bytes.NewBuffer(v))
 			err := dec.Decode(&met)
 			if err != nil {
