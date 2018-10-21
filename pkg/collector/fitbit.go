@@ -20,15 +20,6 @@ const (
 	fitbitURI = "https://api.fitbit.com/1/user/-"
 )
 
-type activitiesSteps struct {
-	Steps []steps `json:"activities-steps"`
-}
-
-type steps struct {
-	ActivityDate string `json:"dateTime"`
-	Steps        string `json:"value"`
-}
-
 // FitbitCollector is used to collect metrics from Fitbit API and implements Collector interface
 type FitbitCollector struct {
 	baseURI string
@@ -78,7 +69,7 @@ func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]Metric, er
 
 	switch metricName {
 	case "steps":
-		m, err = getSteps(c.client, c.baseURI, daysBack)
+		m, err = c.getSteps(daysBack)
 	default:
 		err = fmt.Errorf("Unsupported metric: %s", metricName)
 	}
@@ -86,15 +77,15 @@ func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]Metric, er
 	return m, err
 }
 
-func getSteps(client *http.Client, baseURI string, daysBack int) ([]Metric, error) {
-	var a activitiesSteps
+func (c *FitbitCollector) getSteps(daysBack int) ([]Metric, error) {
+	var a FitbitActivities
 	var m []Metric
 
 	end := time.Now().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
 
 	endpoint := fmt.Sprintf("activities/steps/date/%s/%s.json", start.Format("2006-01-02"), end.Format("2006-01-02"))
-	resp, err := doRequest(client, baseURI, endpoint)
+	resp, err := doRequest(c.client, c.baseURI, endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "collecting steps failed")
 	}
