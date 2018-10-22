@@ -5,20 +5,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ajbosco/statboard/pkg/metric"
+	"github.com/ajbosco/statboard/pkg/statboard"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRenderChart(t *testing.T) {
 	defer os.Remove("test-chart.png")
 
-	metrics := []metric.Metric{
-		metric.Metric{
+	metrics := []statboard.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 3.0,
 		},
-		metric.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now().AddDate(0, 0, -1),
 			Value: 4.0,
@@ -32,8 +32,8 @@ func TestRenderChart(t *testing.T) {
 func TestRenderChart_OneRecord(t *testing.T) {
 	defer os.Remove("test-chart.png")
 
-	metrics := []metric.Metric{
-		metric.Metric{
+	metrics := []statboard.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 3.0,
@@ -47,13 +47,13 @@ func TestRenderChart_OneRecord(t *testing.T) {
 func TestRenderChart_RepeatYValue(t *testing.T) {
 	defer os.Remove("test-chart.png")
 
-	metrics := []metric.Metric{
-		metric.Metric{
+	metrics := []statboard.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 3.0,
 		},
-		metric.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now().AddDate(0, 1, -1),
 			Value: 3.0,
@@ -67,13 +67,13 @@ func TestRenderChart_RepeatYValue(t *testing.T) {
 func TestRenderChart_RepeatXValue(t *testing.T) {
 	defer os.Remove("test-chart.png")
 
-	metrics := []metric.Metric{
-		metric.Metric{
+	metrics := []statboard.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 3.0,
 		},
-		metric.Metric{
+		statboard.Metric{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 4.0,

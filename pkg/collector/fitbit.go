@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/ajbosco/statboard/pkg/config"
-	"github.com/ajbosco/statboard/pkg/metric"
+	"github.com/ajbosco/statboard/pkg/statboard"
 	"github.com/pkg/errors"
 	"github.com/sajal/fitbitclient"
 )
@@ -54,8 +54,8 @@ func NewFitbitCollector(cfg config.Config) (*FitbitCollector, error) {
 }
 
 // Collect returns metric from Fitbit API
-func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]metric.Metric, error) {
-	var m []metric.Metric
+func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]statboard.Metric, error) {
+	var m []statboard.Metric
 	var err error
 
 	switch metricName {
@@ -68,9 +68,9 @@ func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]metric.Met
 	return m, err
 }
 
-func (c *FitbitCollector) getSteps(daysBack int) ([]metric.Metric, error) {
+func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
 	var a FitbitActivities
-	var m []metric.Metric
+	var m []statboard.Metric
 
 	end := time.Now().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
@@ -95,7 +95,7 @@ func (c *FitbitCollector) getSteps(daysBack int) ([]metric.Metric, error) {
 			return nil, errors.Wrap(err, "converting steps to float failed")
 		}
 
-		met := metric.Metric{
+		met := statboard.Metric{
 			Name:  "fitbit.steps",
 			Date:  dt,
 			Value: v,
