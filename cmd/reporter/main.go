@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/ajbosco/statboard/pkg/config"
-	"github.com/ajbosco/statboard/pkg/metric"
 	"github.com/ajbosco/statboard/pkg/reporter"
+	"github.com/ajbosco/statboard/pkg/storage"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	//Create metric store
-	s, err := metric.NewStormStore(cfg.Db.FilePath)
+	s, err := storage.NewStormStore(cfg.Db.FilePath)
 	if err != nil {
 		logrus.Fatal(err)
 	}

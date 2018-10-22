@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ajbosco/statboard/pkg/metric"
+	"github.com/ajbosco/statboard/pkg/statboard"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	chart "github.com/wcharczuk/go-chart"
@@ -15,7 +15,7 @@ import (
 )
 
 // RenderChart formats the Statboard metrics and renders a go-chart time series plot
-func RenderChart(name string, chartColor string, filePath string, metrics []metric.Metric) error {
+func RenderChart(name string, chartColor string, filePath string, metrics []statboard.Metric) error {
 	if len(metrics) <= 1 {
 		return fmt.Errorf("time series charts require more than 1 value, only found %d. collect more data", len(metrics))
 	}
