@@ -2,7 +2,7 @@ module github.com/ajbosco/statboard
 
 require (
 	github.com/asdine/storm v2.1.2+incompatible
-	github.com/etcd-io/bbolt v1.3.0
+	github.com/etcd-io/bbolt v1.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/pkg/errors v0.8.0
