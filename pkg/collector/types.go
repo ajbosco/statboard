@@ -1,7 +1,5 @@
 package collector
 
-import "time"
-
 // FitbitActivities defines the struct for the Fitbit activies object
 type FitbitActivities struct {
 	Steps []FitbitSteps `json:"activities-steps"`
@@ -11,11 +9,4 @@ type FitbitActivities struct {
 type FitbitSteps struct {
 	ActivityDate string `json:"dateTime"`
 	Steps        string `json:"value"`
-}
-
-type metric struct {
-	ID    string
-	Name  string
-	Date  time.Time
-	Value float64
 }
