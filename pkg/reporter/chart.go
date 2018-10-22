@@ -48,6 +48,12 @@ func RenderChart(name string, chartColor string, filePath string, metrics []metr
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
 			Style: chart.Style{Show: true},
+			ValueFormatter: func(v interface{}) string {
+				if typed, isTyped := v.(float64); isTyped {
+					return time.Unix(0, int64(typed)).UTC().Format("2006-01-02")
+				}
+				return fmt.Sprint(v)
+			},
 		},
 		YAxis: chart.YAxis{
 			Style: chart.Style{Show: true},
