@@ -13,12 +13,12 @@ func TestRenderChart(t *testing.T) {
 	defer os.Remove("test-chart.png")
 
 	metrics := []statboard.Metric{
-		statboard.Metric{
+		{
 			Name:  "testMetric",
 			Date:  time.Now(),
 			Value: 3.0,
 		},
-		statboard.Metric{
+		{
 			Name:  "testMetric",
 			Date:  time.Now().AddDate(0, 0, -1),
 			Value: 4.0,
