@@ -62,18 +62,24 @@ func (c *GithubCollector) Collect(metricName string, daysBack int) ([]statboard.
 }
 
 func (c *GithubCollector) getContributions(daysBack int) ([]statboard.Metric, error) {
-	var metrics []statboard.Metric
-
 	end := time.Now().UTC().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
 
-	// Generate statboard.Metric for each date in range
-	for d := start.Truncate(24 * time.Hour); d.Before(end) || d.Equal(end); d = d.AddDate(0, 0, 1) {
-		met := statboard.Metric{Date: d, Name: "github.contributions", Value: 0}
-		metrics = append(metrics, met)
+	metrics := generateEmptyMetrics("github.contributions", start, end)
+
+	events, err := c.fetchEvents()
+	if err != nil {
+		return nil, err
 	}
 
-	// Fetch events from Github and aggregate them into statboard Metrics
+	metrics = aggregateEvents(events, metrics)
+
+	return metrics, nil
+}
+
+func (c *GithubCollector) fetchEvents() ([]github.Event, error) {
+	var events []github.Event
+
 	opt := &github.ListOptions{}
 	for page := 1; ; page++ {
 		opt.Page = page
@@ -85,12 +91,7 @@ func (c *GithubCollector) getContributions(daysBack int) ([]statboard.Metric, er
 		for _, event := range events {
 			// Only count activity for contribution events
 			if isContribEvent(*event.Type) {
-				for i := 0; i < len(metrics); i++ {
-					met := &metrics[i]
-					if event.CreatedAt.Truncate(24 * time.Hour).Equal(met.Date) {
-						met.Value++
-					}
-				}
+				events = append(events, event)
 			}
 		}
 
@@ -99,7 +100,23 @@ func (c *GithubCollector) getContributions(daysBack int) ([]statboard.Metric, er
 		}
 	}
 
-	return metrics, nil
+	return events, nil
+}
+
+func aggregateEvents(events []github.Event, metrics []statboard.Metric) []statboard.Metric {
+	for _, event := range events {
+		// Only count activity for contribution events
+		if isContribEvent(*event.Type) {
+			for i := 0; i < len(metrics); i++ {
+				met := &metrics[i]
+				if event.CreatedAt.Truncate(24 * time.Hour).Equal(met.Date) {
+					met.Value++
+				}
+			}
+		}
+	}
+
+	return metrics
 }
 
 func isContribEvent(eventType string) bool {
