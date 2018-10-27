@@ -77,6 +77,8 @@ func createCollector(collectorType string, cfg config.Config) (collector.Collect
 	switch collectorType {
 	case "fitbit":
 		c, err = collector.NewFitbitCollector(cfg)
+	case "github":
+		c, err = collector.NewGithubCollector(cfg)
 	default:
 		err = fmt.Errorf("Unsupported collector type:%q", collectorType)
 	}

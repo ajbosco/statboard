@@ -9,6 +9,7 @@ type Config struct {
 		DirPath string `mapstructure:"dir_path"`
 	} `mapstructure:"charts"`
 	Fitbit  fitbitConfig                       `mapstructure:"fitbit"`
+	Github  githubConfig                       `mapstructure:"github"`
 	Metrics map[string]map[string]metricConfig `mapstructure:"metrics"`
 }
 
@@ -18,41 +19,12 @@ type fitbitConfig struct {
 	CacheFile    string `mapstructure:"cache_file"`
 }
 
+type githubConfig struct {
+	Username    string `mapstructure:"user_name"`
+	AccessToken string `mapstructure:"access_token"`
+}
+
 type metricConfig struct {
 	Color    string `mapstructure:"color"`
 	DaysBack int    `mapstructure:"days_back"`
 }
-
-// func main() {
-
-// 	viper.SetConfigName("test")
-// 	viper.AddConfigPath(".")
-// 	err := viper.ReadInConfig()
-// 	if err != nil {
-// 		log.Panic("error:", err)
-// 	}
-
-// 	var config Config
-
-// 	err = viper.Unmarshal(&config)
-// 	if err != nil {
-// 		panic(fmt.Errorf("Unable to decode Config: %s \n", err))
-// 	}
-// 	// fmt.Println(config)
-
-// 	fmt.Println(config.Db.FilePath)
-// 	fmt.Println(config.Charts.DirPath)
-// 	fmt.Println(config.Fitbit.ClientID)
-// 	fmt.Println(config.Fitbit.CacheFile)
-// 	// fmt.Println(config.Metrics["fitbit"]["steps"].color)
-// 	// fmt.Println(config.Metrics["fitbit"]["other_met"].daysBack)
-
-// 	for k, m := range config.Metrics {
-// 		fmt.Println(k)
-// 		for k, v := range m {
-// 			fmt.Println(k)
-// 			fmt.Println(v.Color)
-// 			fmt.Println(v.DaysBack)
-// 		}
-// 	}
-// }
