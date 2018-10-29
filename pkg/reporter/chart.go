@@ -1,85 +1,95 @@
 package reporter
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"time"
+	"html/template"
+	"strings"
 
+	chartjs "github.com/ajbosco/goChartjs"
 	"github.com/ajbosco/statboard/pkg/statboard"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	chart "github.com/wcharczuk/go-chart"
-	"github.com/wcharczuk/go-chart/drawing"
+	colors "gopkg.in/go-playground/colors.v1"
 )
 
-// RenderChart formats the Statboard metrics and renders a go-chart time series plot
-func RenderChart(name string, chartColor string, filePath string, metrics []statboard.Metric) error {
-	if len(metrics) <= 1 {
-		return fmt.Errorf("time series charts require more than 1 value, only found %d. collect more data", len(metrics))
-	}
-	var series []chart.Series
-	var x []time.Time
-	var y []float64
-
-	for _, met := range metrics {
-		x = append(x, met.Date)
-		y = append(y, met.Value)
-	}
-
-	ts := chart.TimeSeries{
-		Style: chart.Style{
-			Show:        true,
-			StrokeColor: drawing.ColorFromHex(chartColor),
-			FillColor:   drawing.ColorFromHex(chartColor),
-		},
-		XValues: x,
-		YValues: y,
-	}
-	if err := ts.Validate(); err != nil {
-		return errors.Wrap(err, "invalid time series chart")
-	}
-
-	series = append(series, ts)
-
-	fileName := fmt.Sprintf("%v-chart.png", name)
-
-	graph := chart.Chart{
-		XAxis: chart.XAxis{
-			Style: chart.Style{Show: true},
-			ValueFormatter: func(v interface{}) string {
-				if typed, isTyped := v.(float64); isTyped {
-					return time.Unix(0, int64(typed)).UTC().Format("2006-01-02")
-				}
-				return fmt.Sprint(v)
-			},
-		},
-		YAxis: chart.YAxis{
-			Style: chart.Style{Show: true},
-		},
-		Series: series,
-	}
-
-	return writeChart(graph, filePath, fileName)
+// Chart contains information for creating a new metric chart
+type Chart struct {
+	metricName string
+	ChartName  string
+	color      string
+	metrics    []statboard.Metric
+	ChartJS    template.HTML
 }
 
-func writeChart(c chart.Chart, filePath string, fileName string) error {
-	if err := os.MkdirAll(filePath, 0777); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to create chart directory:%q", filePath))
+// NewChart returns a chart object
+func NewChart(metricName string, chartName string, color string, metrics []statboard.Metric) (Chart, error) {
+	validName := strings.Replace(metricName, ".", "_", -1)
+	hex, err := colors.ParseHEX(color)
+	if err != nil {
+		return Chart{}, errors.Wrap(err, fmt.Sprintf("failed to parse color %q", color))
 	}
 
-	buf := bytes.NewBuffer([]byte{})
-	fullPath := fmt.Sprintf("%v/%v", filePath, fileName)
+	return Chart{metricName: validName, ChartName: chartName, color: hex.ToRGB().String(), metrics: metrics}, nil
+}
 
-	if err := c.Render(chart.PNG, buf); err != nil {
-		return errors.Wrap(err, "failed to render chart")
+// RenderChart formats the Statboard metrics and returns chart.js string
+func (c *Chart) RenderChart() (string, error) {
+	chartData := metricsToPoints(c.metrics)
+
+	chart := getChart(chartData, c.metricName, c.color)
+
+	s, err := chart.Render()
+	if err != nil {
+		return "", errors.Wrap(err, "rendering chart failed")
 	}
 
-	if err := ioutil.WriteFile(fullPath, buf.Bytes(), 0644); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to write chart to filePath:%q", fullPath))
-	}
-	logrus.Info(fmt.Sprintf("chart written to %q", fullPath))
+	return s, nil
+}
 
-	return nil
+// metricsToPoints converts statboard Metrics to chart.js points
+func metricsToPoints(metrics []statboard.Metric) []chartjs.Point {
+	var data []chartjs.Point
+
+	for _, met := range metrics {
+		point := chartjs.Point{X: met.Date.Format("02-Jan-2006"), Y: met.Value}
+		data = append(data, point)
+	}
+
+	return data
+}
+
+// getChart formats and returns Chartjs object
+func getChart(chartData []chartjs.Point, metricName string, chartColor string) chartjs.Chart {
+	lineTension := 0
+
+	dataset := []chartjs.Dataset{{
+		Label:           metricName,
+		LineTension:     &lineTension,
+		Data:            chartData,
+		BackgroundColor: chartColor,
+	},
+	}
+
+	c := chartjs.Chart{
+		Name:      metricName,
+		ChartType: "line",
+		Options: &chartjs.Options{
+
+			Scales: chartjs.Scales{
+				XAxes: []chartjs.Axes{
+					{
+						Time: &chartjs.Time{
+							Unit: "day",
+						},
+						Type: "time",
+					},
+				},
+			},
+			MaintainAspectRatio: chartjs.False,
+			Responsive:          chartjs.True,
+		},
+	}
+
+	c.Data.Datasets = dataset
+
+	return c
 }

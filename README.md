@@ -4,3 +4,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/ajbosco/statboard?style=flat-square)](https://goreportcard.com/report/github.com/ajbosco/statboard)
 
 Personal dashboard and metrics collector
+
+![screenshot](/img/screenshot.png)
