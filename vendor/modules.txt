@@ -1,3 +1,5 @@
+# github.com/ajbosco/goChartjs v0.0.0-20181029001456-2cc424933bd0
+github.com/ajbosco/goChartjs
 # github.com/asdine/storm v2.1.2+incompatible
 github.com/asdine/storm
 github.com/asdine/storm/q
@@ -9,9 +11,6 @@ github.com/asdine/storm/internal
 github.com/davecgh/go-spew/spew
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
-# github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-github.com/golang/freetype/truetype
-github.com/golang/freetype/raster
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
 # github.com/google/go-github v17.0.0+incompatible
@@ -60,22 +59,10 @@ github.com/spf13/pflag
 github.com/spf13/viper
 # github.com/stretchr/testify v1.2.2
 github.com/stretchr/testify/assert
-# github.com/wcharczuk/go-chart v2.0.1+incompatible
-github.com/wcharczuk/go-chart
-github.com/wcharczuk/go-chart/drawing
-github.com/wcharczuk/go-chart/matrix
-github.com/wcharczuk/go-chart/roboto
-github.com/wcharczuk/go-chart/seq
-github.com/wcharczuk/go-chart/util
 # go.etcd.io/bbolt v1.3.0
 go.etcd.io/bbolt
 # golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/image v0.0.0-20180926015637-991ec62608f3
-golang.org/x/image/font
-golang.org/x/image/draw
-golang.org/x/image/math/f64
-golang.org/x/image/math/fixed
 # golang.org/x/net v0.0.0-20181017193950-04a2e542c03f
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -97,5 +84,7 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
+# gopkg.in/go-playground/colors.v1 v1.1.1
+gopkg.in/go-playground/colors.v1
 # gopkg.in/yaml.v2 v2.2.1
 gopkg.in/yaml.v2

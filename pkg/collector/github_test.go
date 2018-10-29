@@ -15,13 +15,13 @@ func TestGithubAggregateEvents(t *testing.T) {
 
 	tt := []struct {
 		name     string
-		events   []github.Event
+		events   []*github.Event
 		metrics  []statboard.Metric
 		expected []statboard.Metric
 	}{
 		{
 			name: "single event",
-			events: []github.Event{
+			events: []*github.Event{
 				{
 					Type:      &testEventType,
 					CreatedAt: &testCreatedAt,
@@ -54,7 +54,7 @@ func TestGithubAggregateEvents(t *testing.T) {
 		},
 		{
 			name: "multiple events",
-			events: []github.Event{
+			events: []*github.Event{
 				{
 					Type:      &testEventType,
 					CreatedAt: &testCreatedAt,
@@ -85,7 +85,7 @@ func TestGithubAggregateEvents(t *testing.T) {
 		},
 		{
 			name:   "no events",
-			events: []github.Event{},
+			events: []*github.Event{},
 			metrics: []statboard.Metric{
 				{
 					Name:  "testMetric",

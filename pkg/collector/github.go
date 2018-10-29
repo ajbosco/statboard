@@ -77,8 +77,8 @@ func (c *GithubCollector) getContributions(daysBack int) ([]statboard.Metric, er
 	return metrics, nil
 }
 
-func (c *GithubCollector) fetchEvents() ([]github.Event, error) {
-	var events []github.Event
+func (c *GithubCollector) fetchEvents() ([]*github.Event, error) {
+	var contribEvents []*github.Event
 
 	opt := &github.ListOptions{}
 	for page := 1; ; page++ {
@@ -91,7 +91,7 @@ func (c *GithubCollector) fetchEvents() ([]github.Event, error) {
 		for _, event := range events {
 			// Only count activity for contribution events
 			if isContribEvent(*event.Type) {
-				events = append(events, event)
+				contribEvents = append(contribEvents, event)
 			}
 		}
 
@@ -100,10 +100,10 @@ func (c *GithubCollector) fetchEvents() ([]github.Event, error) {
 		}
 	}
 
-	return events, nil
+	return contribEvents, nil
 }
 
-func aggregateEvents(events []github.Event, metrics []statboard.Metric) []statboard.Metric {
+func aggregateEvents(events []*github.Event, metrics []statboard.Metric) []statboard.Metric {
 	for _, event := range events {
 		// Only count activity for contribution events
 		if isContribEvent(*event.Type) {

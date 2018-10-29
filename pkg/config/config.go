@@ -25,6 +25,7 @@ type githubConfig struct {
 }
 
 type metricConfig struct {
-	Color    string `mapstructure:"color"`
-	DaysBack int    `mapstructure:"days_back"`
+	ChartName string `mapstructure:"chart_name"`
+	Color     string `mapstructure:"color"`
+	DaysBack  int    `mapstructure:"days_back"`
 }
