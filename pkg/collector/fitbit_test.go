@@ -12,7 +12,7 @@ func TestFitbitCollect_Steps(t *testing.T) {
 
 	c := FitbitCollector{client: server.Client(), baseURI: server.URL}
 
-	metrics, err := c.Collect("steps", 1)
+	metrics, err := c.Collect("steps", 1, "day")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,6 +29,6 @@ func TestFitbitCollect_Steps(t *testing.T) {
 func TestFitbitCollect_InvalidMetric(t *testing.T) {
 	c := FitbitCollector{}
 
-	_, err := c.Collect("fake_metric", 1)
+	_, err := c.Collect("fake_metric", 1, "day")
 	assert.Error(t, err)
 }

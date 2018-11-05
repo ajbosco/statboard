@@ -54,7 +54,7 @@ func NewFitbitCollector(cfg config.Config) (*FitbitCollector, error) {
 }
 
 // Collect returns metric from Fitbit API
-func (c *FitbitCollector) Collect(metricName string, daysBack int) ([]statboard.Metric, error) {
+func (c *FitbitCollector) Collect(metricName string, daysBack int, granularity string) ([]statboard.Metric, error) {
 	var m []statboard.Metric
 	var err error
 

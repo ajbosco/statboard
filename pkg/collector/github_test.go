@@ -140,6 +140,6 @@ func TestGithubIsContribEvent(t *testing.T) {
 func TestGithubCollect_InvalidMetric(t *testing.T) {
 	c := GithubCollector{}
 
-	_, err := c.Collect("fake_metric", 1)
+	_, err := c.Collect("fake_metric", 1, "day")
 	assert.Error(t, err)
 }

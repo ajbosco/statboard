@@ -1,5 +1,7 @@
 # github.com/ajbosco/goChartjs v0.0.0-20181029014219-cd3e423486d9
 github.com/ajbosco/goChartjs
+# github.com/ajbosco/reads v0.1.1
+github.com/ajbosco/reads/goodreads
 # github.com/asdine/storm v2.1.2+incompatible
 github.com/asdine/storm
 github.com/asdine/storm/q
@@ -36,6 +38,8 @@ github.com/konsorten/go-windows-terminal-sequences
 github.com/magiconair/properties
 # github.com/mitchellh/mapstructure v1.0.0
 github.com/mitchellh/mapstructure
+# github.com/mrjones/oauth v0.0.0-20180629183705-f4e24b6d100c
+github.com/mrjones/oauth
 # github.com/pelletier/go-toml v1.2.0
 github.com/pelletier/go-toml
 # github.com/pkg/errors v0.8.0

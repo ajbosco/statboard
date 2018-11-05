@@ -5,6 +5,7 @@ require (
 	github.com/DataDog/zstd v1.3.4 // indirect
 	github.com/Sereal/Sereal v0.0.0-20180905114147-563b78806e28 // indirect
 	github.com/ajbosco/goChartjs v0.0.0-20181029014219-cd3e423486d9
+	github.com/ajbosco/reads v0.1.1
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
@@ -23,4 +24,5 @@ require (
 	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f // indirect
 	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/go-playground/colors.v1 v1.1.1
+	gopkg.in/yaml.v2 v2.2.1
 )

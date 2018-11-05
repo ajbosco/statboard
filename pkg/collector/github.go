@@ -47,13 +47,13 @@ func NewGithubCollector(cfg config.Config) (*GithubCollector, error) {
 }
 
 // Collect returns metric from Github API
-func (c *GithubCollector) Collect(metricName string, daysBack int) ([]statboard.Metric, error) {
+func (c *GithubCollector) Collect(metricName string, daysBack int, granularity string) ([]statboard.Metric, error) {
 	var m []statboard.Metric
 	var err error
 
 	switch metricName {
 	case "contributions":
-		m, err = c.getContributions(daysBack)
+		m, err = c.getContributions(daysBack, granularity)
 	default:
 		err = fmt.Errorf("unsupported metric: %s", metricName)
 	}
@@ -61,11 +61,11 @@ func (c *GithubCollector) Collect(metricName string, daysBack int) ([]statboard.
 	return m, err
 }
 
-func (c *GithubCollector) getContributions(daysBack int) ([]statboard.Metric, error) {
+func (c *GithubCollector) getContributions(daysBack int, granularity string) ([]statboard.Metric, error) {
 	end := time.Now().UTC().AddDate(0, 0, -1)
 	start := end.AddDate(0, 0, -daysBack)
 
-	metrics := generateEmptyMetrics("github.contributions", start, end)
+	metrics := generateEmptyMetrics("github.contributions", start, end, granularity)
 
 	events, err := c.fetchEvents()
 	if err != nil {
