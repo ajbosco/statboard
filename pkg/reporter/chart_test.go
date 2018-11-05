@@ -82,7 +82,7 @@ func TestChartGetChart(t *testing.T) {
 
 	expected.Data.Datasets = testDataset
 
-	actual := getChart(testPoints, "testMetric", "testColor")
+	actual := getChart(testPoints, "testMetric", "day", "testColor")
 
 	assert.Equal(t, expected, actual)
 }
@@ -98,13 +98,14 @@ func TestChartNewChart(t *testing.T) {
 	}
 
 	expected := Chart{
-		metricName: "testMetric",
-		ChartName:  "testChart",
-		color:      "rgb(66,134,244)",
-		metrics:    testMetric,
+		metricName:  "testMetric",
+		ChartName:   "testChart",
+		granularity: "day",
+		color:       "rgb(66,134,244)",
+		metrics:     testMetric,
 	}
 
-	actual, err := NewChart("testMetric", "testChart", "#4286f4", testMetric)
+	actual, err := NewChart("testMetric", "testChart", "day", "#4286f4", testMetric)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expected, actual)
@@ -120,6 +121,6 @@ func TestChartNewChart_InvalidColor(t *testing.T) {
 		},
 	}
 
-	_, err := NewChart("testMetric", "testChart", "fakeColor", testMetric)
+	_, err := NewChart("testMetric", "testChart", "day", "fakeColor", testMetric)
 	assert.Error(t, err)
 }

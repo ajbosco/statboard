@@ -13,29 +13,30 @@ import (
 
 // Chart contains information for creating a new metric chart
 type Chart struct {
-	metricName string
-	ChartName  string
-	color      string
-	metrics    []statboard.Metric
-	ChartJS    template.HTML
+	metricName  string
+	ChartName   string
+	color       string
+	granularity string
+	metrics     []statboard.Metric
+	ChartJS     template.HTML
 }
 
 // NewChart returns a chart object
-func NewChart(metricName string, chartName string, color string, metrics []statboard.Metric) (Chart, error) {
+func NewChart(metricName string, chartName string, granularity string, color string, metrics []statboard.Metric) (Chart, error) {
 	validName := strings.Replace(metricName, ".", "_", -1)
 	hex, err := colors.ParseHEX(color)
 	if err != nil {
 		return Chart{}, errors.Wrap(err, fmt.Sprintf("failed to parse color %q", color))
 	}
 
-	return Chart{metricName: validName, ChartName: chartName, color: hex.ToRGB().String(), metrics: metrics}, nil
+	return Chart{metricName: validName, ChartName: chartName, granularity: granularity, color: hex.ToRGB().String(), metrics: metrics}, nil
 }
 
 // RenderChart formats the Statboard metrics and returns chart.js string
 func (c *Chart) RenderChart() (string, error) {
 	chartData := metricsToPoints(c.metrics)
 
-	chart := getChart(chartData, c.metricName, c.color)
+	chart := getChart(chartData, c.metricName, c.granularity, c.color)
 
 	s, err := chart.Render()
 	if err != nil {
@@ -58,7 +59,7 @@ func metricsToPoints(metrics []statboard.Metric) []chartjs.Point {
 }
 
 // getChart formats and returns Chartjs object
-func getChart(chartData []chartjs.Point, metricName string, chartColor string) chartjs.Chart {
+func getChart(chartData []chartjs.Point, metricName string, granularity string, chartColor string) chartjs.Chart {
 	lineTension := 0
 
 	dataset := []chartjs.Dataset{{
@@ -78,7 +79,7 @@ func getChart(chartData []chartjs.Point, metricName string, chartColor string) c
 				XAxes: []chartjs.Axes{
 					{
 						Time: &chartjs.Time{
-							Unit: "day",
+							Unit: granularity,
 						},
 						Type: "time",
 					},

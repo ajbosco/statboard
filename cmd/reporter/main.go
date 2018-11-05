@@ -76,7 +76,7 @@ func main() {
 			}
 
 			// Render chart for  metric values
-			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.Color, met)
+			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.Granularity, metCfg.Color, met)
 			if err != nil {
 				logrus.Fatal(err)
 			}
