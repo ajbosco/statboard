@@ -47,13 +47,13 @@ func NewGithubCollector(cfg config.Config) (*GithubCollector, error) {
 }
 
 // Collect returns metric from Github API
-func (c *GithubCollector) Collect(metricName string, daysBack int, granularity string) ([]statboard.Metric, error) {
+func (c *GithubCollector) Collect(metricName string, monthsBack int) ([]statboard.Metric, error) {
 	var m []statboard.Metric
 	var err error
 
 	switch metricName {
 	case "contributions":
-		m, err = c.getContributions(daysBack, granularity)
+		m, err = c.getContributions(monthsBack)
 	default:
 		err = fmt.Errorf("unsupported metric: %s", metricName)
 	}
@@ -61,11 +61,14 @@ func (c *GithubCollector) Collect(metricName string, daysBack int, granularity s
 	return m, err
 }
 
-func (c *GithubCollector) getContributions(daysBack int, granularity string) ([]statboard.Metric, error) {
-	end := time.Now().UTC().AddDate(0, 0, -1)
-	start := end.AddDate(0, 0, -daysBack)
+func (c *GithubCollector) getContributions(monthsBack int) ([]statboard.Metric, error) {
+	// set range for which we will collect steps
+	t := time.Now().AddDate(0, 0, -1)
+	end := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+	start := end.AddDate(0, -monthsBack, 0)
 
-	metrics := generateEmptyMetrics("github.contributions", start, end, granularity)
+	// create metric for each month in range
+	metrics := generateEmptyMetrics("github.contributions", start, end)
 
 	events, err := c.fetchEvents()
 	if err != nil {
@@ -109,13 +112,14 @@ func aggregateEvents(events []*github.Event, metrics []statboard.Metric) []statb
 		if isContribEvent(*event.Type) {
 			for i := 0; i < len(metrics); i++ {
 				met := &metrics[i]
-				if event.CreatedAt.Truncate(24 * time.Hour).Equal(met.Date) {
+				// get first of day of month for date of step activity
+				eventDt := time.Date(event.CreatedAt.Year(), event.CreatedAt.Month(), 1, 0, 0, 0, 0, time.UTC)
+				if eventDt.Equal(met.Date) {
 					met.Value++
 				}
 			}
 		}
 	}
-
 	return metrics
 }
 

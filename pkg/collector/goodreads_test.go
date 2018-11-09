@@ -207,6 +207,6 @@ func TestGoodreadsAggregatePages(t *testing.T) {
 func TestGoodreadsCollect_InvalidMetric(t *testing.T) {
 	c := GoodreadsCollector{}
 
-	_, err := c.Collect("fake_metric", 1, "month")
+	_, err := c.Collect("fake_metric", 1)
 	assert.Error(t, err)
 }

@@ -41,11 +41,12 @@ type goodreadsConfig struct {
 	AccessSecret    string `mapstructure:"access_secret" yaml:"access_secret"`
 }
 
+// MetricConfig contains information for collecting and visualizing a metric
 type MetricConfig struct {
-	ChartName   string `mapstructure:"chart_name" yaml:"chart_name"`
-	Color       string `mapstructure:"color" yaml:"color"`
-	DaysBack    int    `mapstructure:"days_back" yaml:"days_back"`
-	Granularity string `mapstructure:"granularity" yaml:"granularity"`
+	ChartName         string `mapstructure:"chart_name" yaml:"chart_name"`
+	ChartColor        string `mapstructure:"chart_color" yaml:"chart_color"`
+	ChartMonthsBack   int    `mapstructure:"chart_months_back" yaml:"chart_months_back"`
+	CollectMonthsBack int    `mapstructure:"collect_months_back" yaml:"collect_months_back"`
 }
 
 // Write writes a Config object to the config file
