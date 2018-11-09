@@ -66,7 +66,7 @@ func main() {
 
 			// Fetch metric values from database
 			metricName := fmt.Sprintf("%s.%s", metType, metName)
-			met, err := s.GetMetric(metricName, time.Now().AddDate(0, 0, -metCfg.DaysBack))
+			met, err := s.GetMetric(metricName, time.Now().AddDate(0, -metCfg.ChartMonthsBack, 0))
 			if err != nil {
 				logrus.Fatal(err)
 			}
@@ -76,7 +76,7 @@ func main() {
 			}
 
 			// Render chart for  metric values
-			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.Granularity, metCfg.Color, met)
+			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.ChartColor, met)
 			if err != nil {
 				logrus.Fatal(err)
 			}

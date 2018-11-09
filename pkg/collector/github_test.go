@@ -35,7 +35,7 @@ func TestGithubAggregateEvents(t *testing.T) {
 				},
 				{
 					Name:  "testMetric",
-					Date:  testCreatedAt.Truncate(24 * time.Hour),
+					Date:  time.Date(testCreatedAt.Year(), testCreatedAt.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour),
 					Value: 0.0,
 				},
 			},
@@ -47,7 +47,7 @@ func TestGithubAggregateEvents(t *testing.T) {
 				},
 				{
 					Name:  "testMetric",
-					Date:  testCreatedAt.Truncate(24 * time.Hour),
+					Date:  time.Date(testCreatedAt.Year(), testCreatedAt.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour),
 					Value: 1.0,
 				},
 			},
@@ -71,14 +71,14 @@ func TestGithubAggregateEvents(t *testing.T) {
 			metrics: []statboard.Metric{
 				{
 					Name:  "testMetric",
-					Date:  testCreatedAt.Truncate(24 * time.Hour),
+					Date:  time.Date(testCreatedAt.Year(), testCreatedAt.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour),
 					Value: 0.0,
 				},
 			},
 			expected: []statboard.Metric{
 				{
 					Name:  "testMetric",
-					Date:  testCreatedAt.Truncate(24 * time.Hour),
+					Date:  time.Date(testCreatedAt.Year(), testCreatedAt.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour),
 					Value: 3.0,
 				},
 			},
@@ -140,6 +140,6 @@ func TestGithubIsContribEvent(t *testing.T) {
 func TestGithubCollect_InvalidMetric(t *testing.T) {
 	c := GithubCollector{}
 
-	_, err := c.Collect("fake_metric", 1, "day")
+	_, err := c.Collect("fake_metric", 1)
 	assert.Error(t, err)
 }

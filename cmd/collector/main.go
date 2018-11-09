@@ -66,7 +66,7 @@ func main() {
 					defer metWg.Done()
 					metricName := fmt.Sprintf("%s.%s", metType, metName)
 					logrus.Info(fmt.Sprintf("collecting %q", metricName))
-					metrics, err := c.Collect(metName, metCfg.DaysBack, metCfg.Granularity)
+					metrics, err := c.Collect(metName, metCfg.CollectMonthsBack)
 					if err != nil {
 						logrus.Fatal(errors.Wrap(err, fmt.Sprintf("failed to collect metric:%q", metricName)))
 					}

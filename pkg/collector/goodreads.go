@@ -55,15 +55,15 @@ func NewGoodreadsCollector(cfg config.Config) (*GoodreadsCollector, error) {
 }
 
 // Collect returns metric from Goodreads API
-func (c *GoodreadsCollector) Collect(metricName string, daysBack int, granularity string) ([]statboard.Metric, error) {
+func (c *GoodreadsCollector) Collect(metricName string, monthsBack int) ([]statboard.Metric, error) {
 	var m []statboard.Metric
 	var err error
 
 	switch metricName {
 	case "books_read":
-		m, err = c.getBooksRead(daysBack, granularity)
+		m, err = c.getBooksRead(monthsBack)
 	case "pages_read":
-		m, err = c.getPagesRead(daysBack, granularity)
+		m, err = c.getPagesRead(monthsBack)
 	default:
 		err = fmt.Errorf("unsupported metric: %s", metricName)
 	}
@@ -71,11 +71,14 @@ func (c *GoodreadsCollector) Collect(metricName string, daysBack int, granularit
 	return m, err
 }
 
-func (c *GoodreadsCollector) getBooksRead(daysBack int, granularity string) ([]statboard.Metric, error) {
-	end := time.Now().UTC().AddDate(0, 0, -1)
-	start := end.AddDate(0, 0, -daysBack)
+func (c *GoodreadsCollector) getBooksRead(monthsBack int) ([]statboard.Metric, error) {
+	// set range for which we will collect steps
+	t := time.Now().AddDate(0, 0, -1)
+	end := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+	start := end.AddDate(0, -monthsBack, 0)
 
-	metrics := generateEmptyMetrics("goodreads.books_read", start, end, granularity)
+	// create metric for each month in range
+	metrics := generateEmptyMetrics("goodreads.books_read", start, end)
 
 	books, err := c.fetchBooks()
 	if err != nil {
@@ -90,11 +93,14 @@ func (c *GoodreadsCollector) getBooksRead(daysBack int, granularity string) ([]s
 	return metrics, nil
 }
 
-func (c *GoodreadsCollector) getPagesRead(daysBack int, granularity string) ([]statboard.Metric, error) {
-	end := time.Now().UTC().AddDate(0, 0, -1)
-	start := end.AddDate(0, 0, -daysBack)
+func (c *GoodreadsCollector) getPagesRead(monthsBack int) ([]statboard.Metric, error) {
+	// set range for which we will collect steps
+	t := time.Now().AddDate(0, 0, -1)
+	end := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+	start := end.AddDate(0, -monthsBack, 0)
 
-	metrics := generateEmptyMetrics("goodreads.pages_read", start, end, granularity)
+	// create metric for each month in range
+	metrics := generateEmptyMetrics("goodreads.pages_read", start, end)
 
 	books, err := c.fetchBooks()
 	if err != nil {

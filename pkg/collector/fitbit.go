@@ -54,13 +54,13 @@ func NewFitbitCollector(cfg config.Config) (*FitbitCollector, error) {
 }
 
 // Collect returns metric from Fitbit API
-func (c *FitbitCollector) Collect(metricName string, daysBack int, granularity string) ([]statboard.Metric, error) {
+func (c *FitbitCollector) Collect(metricName string, monthsBack int) ([]statboard.Metric, error) {
 	var m []statboard.Metric
 	var err error
 
 	switch metricName {
 	case "steps":
-		m, err = c.getSteps(daysBack)
+		m, err = c.getSteps(monthsBack)
 	default:
 		err = fmt.Errorf("unsupported metric: %s", metricName)
 	}
@@ -68,14 +68,19 @@ func (c *FitbitCollector) Collect(metricName string, daysBack int, granularity s
 	return m, err
 }
 
-func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
+func (c *FitbitCollector) getSteps(monthsBack int) ([]statboard.Metric, error) {
 	var a FitbitActivities
-	var m []statboard.Metric
 
-	end := time.Now().AddDate(0, 0, -1)
-	start := end.AddDate(0, 0, -daysBack)
+	// set range for which we will collect steps
+	t := time.Now().AddDate(0, 0, -1)
+	end := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+	start := end.AddDate(0, -monthsBack, 0)
+
+	// create metric for each month in range
+	metrics := generateEmptyMetrics("fitbit.steps", start, end)
 
 	endpoint := fmt.Sprintf("activities/steps/date/%s/%s.json", start.Format("2006-01-02"), end.Format("2006-01-02"))
+	fmt.Println(endpoint)
 	resp, err := doRequest(c.client, c.baseURI, endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "collecting steps failed")
@@ -85,26 +90,11 @@ func (c *FitbitCollector) getSteps(daysBack int) ([]statboard.Metric, error) {
 		return nil, errors.Wrap(err, "unmarshaling steps failed")
 	}
 
-	for _, s := range a.Steps {
-		dt, err := time.Parse("2006-01-02", s.ActivityDate)
-		if err != nil {
-			return nil, errors.Wrap(err, "parsing activity date failed")
-		}
-		v, err := strconv.ParseFloat(s.Steps, 64)
-		if err != nil {
-			return nil, errors.Wrap(err, "converting steps to float failed")
-		}
-
-		met := statboard.Metric{
-			Name:  "fitbit.steps",
-			Date:  dt,
-			Value: v,
-		}
-
-		m = append(m, met)
+	metrics, err = aggregateSteps(a.Steps, metrics)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to aggregate step counts")
 	}
-
-	return m, nil
+	return metrics, nil
 }
 
 func doRequest(client *http.Client, baseURI string, endpoint string) ([]byte, error) {
@@ -134,4 +124,26 @@ func doRequest(client *http.Client, baseURI string, endpoint string) ([]byte, er
 	}
 
 	return b, nil
+}
+
+// aggregateSteps loops through daily step counts and aggregates them by month
+func aggregateSteps(steps []FitbitSteps, metrics []statboard.Metric) ([]statboard.Metric, error) {
+	for _, s := range steps {
+		for i := 0; i < len(metrics); i++ {
+			met := &metrics[i]
+			// parse Activity Date into time.Time
+			dt, err := time.Parse("2006-01-02", s.ActivityDate)
+			// convert Steps string to float
+			steps, err := strconv.ParseFloat(s.Steps, 64)
+			if err != nil {
+				return nil, errors.Wrap(err, "converting steps to float failed")
+			}
+			// get first of day of month for date of step activity
+			stepDate := time.Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, time.UTC)
+			if stepDate.Equal(met.Date) {
+				met.Value = met.Value + steps
+			}
+		}
+	}
+	return metrics, nil
 }
