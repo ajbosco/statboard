@@ -89,7 +89,9 @@ func (d *dashboard) getChartJs() ([]reporter.Chart, error) {
 
 			// Fetch metric values from database
 			metricName := fmt.Sprintf("%s.%s", metType, metName)
-			met, err := d.store.GetMetric(metricName, time.Now().AddDate(0, -metCfg.ChartMonthsBack, 0))
+			sinceDt := time.Now().AddDate(0, -metCfg.ChartMonthsBack, 0)
+			firstOfMonth := time.Date(sinceDt.Year(), sinceDt.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+			met, err := d.store.GetMetric(metricName, firstOfMonth)
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to get metric")
 			}
