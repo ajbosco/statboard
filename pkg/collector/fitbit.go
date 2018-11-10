@@ -72,8 +72,7 @@ func (c *FitbitCollector) getSteps(monthsBack int) ([]statboard.Metric, error) {
 	var a FitbitActivities
 
 	// set range for which we will collect steps
-	t := time.Now().AddDate(0, 0, -1)
-	end := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Truncate(24 * time.Hour)
+	end := time.Now().AddDate(0, 0, -1)
 	start := end.AddDate(0, -monthsBack, 0)
 
 	// create metric for each month in range
