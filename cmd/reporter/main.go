@@ -58,6 +58,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/static/", fs)
 	http.HandleFunc("/", dashboard.handler)
+	http.HandleFunc("/favicon.ico", faviconHandler)
 
 	// start web server
 	err = http.ListenAndServe(":8080", nil)
@@ -116,4 +117,8 @@ func (d *dashboard) getChartJs() ([]reporter.Chart, error) {
 		}
 	}
 	return charts, nil
+}
+
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "/static/favicon.ico")
 }

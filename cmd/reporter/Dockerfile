@@ -2,8 +2,8 @@ FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates
 
-RUN mkdir -p templates
-COPY templates/index.html templates/
+COPY templates templates
+COPY static static
 
 ADD build/reporter /bin/reporter
 
