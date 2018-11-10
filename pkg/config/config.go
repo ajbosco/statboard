@@ -11,12 +11,6 @@ import (
 
 // Config contains information for running Statboard
 type Config struct {
-	Db struct {
-		FilePath string `mapstructure:"file_path" yaml:"file_path"`
-	} `mapstructure:"db" yaml:"db"`
-	Charts struct {
-		DirPath string `mapstructure:"dir_path" yaml:"dir_path"`
-	} `mapstructure:"charts" yaml:"charts"`
 	Fitbit    fitbitConfig                       `mapstructure:"fitbit" yaml:"fitbit"`
 	Github    githubConfig                       `mapstructure:"github" yaml:"github"`
 	Goodreads goodreadsConfig                    `mapstructure:"goodreads" yaml:"goodreads"`

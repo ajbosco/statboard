@@ -17,6 +17,7 @@ import (
 // EnvConfig contains environment variables for the metric reporter
 type EnvConfig struct {
 	ConfigFilePath string `required:"true"`
+	DbFilePath     string `required:"true"`
 }
 
 type dashboard struct {
@@ -45,15 +46,15 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	var cfg config.Config
-
-	err = viper.Unmarshal(&cfg)
+	// Create metric store
+	s, err := storage.NewStormStore(envCfg.DbFilePath)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	// Create metric store
-	s, err := storage.NewStormStore(cfg.Db.FilePath)
+	var cfg config.Config
+
+	err = viper.Unmarshal(&cfg)
 	if err != nil {
 		logrus.Fatal(err)
 	}
