@@ -80,7 +80,6 @@ func (c *FitbitCollector) getSteps(monthsBack int) ([]statboard.Metric, error) {
 	metrics := generateEmptyMetrics("fitbit.steps", start, end)
 
 	endpoint := fmt.Sprintf("activities/steps/date/%s/%s.json", start.Format("2006-01-02"), end.Format("2006-01-02"))
-	fmt.Println(endpoint)
 	resp, err := doRequest(c.client, c.baseURI, endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "collecting steps failed")
