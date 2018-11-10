@@ -11,6 +11,8 @@ require (
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/mux v1.6.2
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/pkg/errors v0.8.0
 	github.com/sajal/fitbitclient v0.0.0-20160707181904-9e74ca7630a5

@@ -11,8 +11,8 @@ import (
 	colors "gopkg.in/go-playground/colors.v1"
 )
 
-// Chart contains information for creating a new metric chart
-type Chart struct {
+// chart contains information for creating a new metric chart
+type chart struct {
 	metricName string
 	ChartName  string
 	color      string
@@ -20,19 +20,19 @@ type Chart struct {
 	ChartJS    template.HTML
 }
 
-// NewChart returns a chart object
-func NewChart(metricName string, chartName string, color string, metrics []statboard.Metric) (Chart, error) {
+// newChart returns a chart object
+func newChart(metricName string, chartName string, color string, metrics []statboard.Metric) (chart, error) {
 	validName := strings.Replace(metricName, ".", "_", -1)
 	hex, err := colors.ParseHEX(color)
 	if err != nil {
-		return Chart{}, errors.Wrap(err, fmt.Sprintf("failed to parse color %q", color))
+		return chart{}, errors.Wrap(err, fmt.Sprintf("failed to parse color %q", color))
 	}
 
-	return Chart{metricName: validName, ChartName: chartName, color: hex.ToRGB().String(), metrics: metrics}, nil
+	return chart{metricName: validName, ChartName: chartName, color: hex.ToRGB().String(), metrics: metrics}, nil
 }
 
-// RenderChart formats the Statboard metrics and returns chart.js string
-func (c *Chart) RenderChart() (string, error) {
+// renderChart formats the Statboard metrics and returns chart.js string
+func (c *chart) renderChart() (string, error) {
 	chartData := metricsToPoints(c.metrics)
 
 	chart := getChart(chartData, c.metricName, c.color)
