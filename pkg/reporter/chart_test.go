@@ -97,14 +97,14 @@ func TestChartNewChart(t *testing.T) {
 		},
 	}
 
-	expected := Chart{
+	expected := chart{
 		metricName: "testMetric",
 		ChartName:  "testChart",
 		color:      "rgb(66,134,244)",
 		metrics:    testMetric,
 	}
 
-	actual, err := NewChart("testMetric", "testChart", "#4286f4", testMetric)
+	actual, err := newChart("testMetric", "testChart", "#4286f4", testMetric)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expected, actual)
@@ -120,6 +120,6 @@ func TestChartNewChart_InvalidColor(t *testing.T) {
 		},
 	}
 
-	_, err := NewChart("testMetric", "testChart", "fakeColor", testMetric)
+	_, err := newChart("testMetric", "testChart", "fakeColor", testMetric)
 	assert.Error(t, err)
 }
