@@ -1,0 +1,39 @@
+metrics:
+  fitbit: 
+    steps:
+      chart_name: "Fitbit Steps"
+      chart_color: "#324851"
+      collect_months_back: 12
+      chart_months_back: 6
+  github: 
+    contributions:
+      chart_name: "Github Contributions"
+      chart_color: "#86AC41"
+      collect_months_back: 12
+      chart_months_back: 6
+  goodreads: 
+    books_read:
+      chart_name: "Books Read"
+      chart_color: "#34675C"
+      collect_months_back: 12
+      chart_months_back: 6
+    pages_read:
+      chart_name: "Pages Read"
+      chart_color: "#7DA3A1"
+      collect_months_back: 12
+      chart_months_back: 6
+    
+fitbit:
+  client_id: ""
+  client_secret: ""
+  cache_file: "/statboard-config/cache/cache.txt"
+
+github:
+  user_name: ""
+  access_token: ""
+
+goodreads:
+  developer_key: ""
+  developer_secret: ""
+  access_token: ""
+  access_secret: ""
