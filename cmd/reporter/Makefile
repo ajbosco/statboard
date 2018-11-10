@@ -27,7 +27,7 @@ docker-push: ## push docker image to registry
 	docker push $(REGISTRY)/$(NAME):$(COMMIT)
 
 .PHONY: docker-run
-docker-run: ## run docker image locally
+docker-run: docker-build ## run docker image locally
 	@docker run --rm \
 	-v ${STATBOARD_DIR}:/statboard \
 	-e STATBOARD_CONFIGFILEPATH=/statboard/config.yml -e STATBOARD_DBFILEPATH=/statboard/statboard.db \
