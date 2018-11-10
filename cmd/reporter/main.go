@@ -10,6 +10,7 @@ import (
 	"github.com/ajbosco/statboard/pkg/reporter"
 	"github.com/ajbosco/statboard/pkg/storage"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -22,15 +23,8 @@ type EnvConfig struct {
 
 type dashboard struct {
 	charts []reporter.Chart
-}
-
-func (d *dashboard) handler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-
-	err := tmpl.Execute(w, d.charts)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	cfg    config.Config
+	store  storage.Store
 }
 
 func main() {
@@ -59,38 +53,7 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	dashboard := &dashboard{}
-
-	// Render charts for all metrics
-	for metType, metCfgs := range cfg.Metrics {
-		for metName, metCfg := range metCfgs {
-
-			// Fetch metric values from database
-			metricName := fmt.Sprintf("%s.%s", metType, metName)
-			met, err := s.GetMetric(metricName, time.Now().AddDate(0, -metCfg.ChartMonthsBack, 0))
-			if err != nil {
-				logrus.Fatal(err)
-			}
-			if len(met) == 0 {
-				logrus.Info(fmt.Sprintf("no metrics returned for %q", metricName))
-				return
-			}
-
-			// Render chart for  metric values
-			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.ChartColor, met)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-			chartString, err := chart.RenderChart()
-			if err != nil {
-				logrus.Fatal(err)
-			}
-			chart.ChartJS = template.HTML(chartString)
-
-			// append charts to dashboard
-			dashboard.charts = append(dashboard.charts, chart)
-		}
-	}
+	dashboard := &dashboard{cfg: cfg, store: s}
 
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/static/", fs)
@@ -101,4 +64,54 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+}
+
+func (d *dashboard) handler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+
+	charts, err := d.getChartJs()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	err = tmpl.Execute(w, charts)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+}
+
+func (d *dashboard) getChartJs() ([]reporter.Chart, error) {
+	var charts []reporter.Chart
+
+	// Render charts for all metrics
+	for metType, metCfgs := range d.cfg.Metrics {
+		for metName, metCfg := range metCfgs {
+
+			// Fetch metric values from database
+			metricName := fmt.Sprintf("%s.%s", metType, metName)
+			met, err := d.store.GetMetric(metricName, time.Now().AddDate(0, -metCfg.ChartMonthsBack, 0))
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to get metric")
+			}
+			if len(met) == 0 {
+				logrus.Info(fmt.Sprintf("no metrics returned for %q", metricName))
+				continue
+			}
+
+			// Render chart for  metric values
+			chart, err := reporter.NewChart(metricName, metCfg.ChartName, metCfg.ChartColor, met)
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to create new chart")
+			}
+			chartString, err := chart.RenderChart()
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to render chart")
+			}
+			chart.ChartJS = template.HTML(chartString)
+
+			// append charts to dashboard
+			charts = append(charts, chart)
+		}
+	}
+	return charts, nil
 }
