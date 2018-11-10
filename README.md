@@ -22,13 +22,13 @@ Personal dashboard and metrics collector
 
 ### Deployment
 
-This project is intended to be deployed via Docker with a shared volume for the backing database. The the `collector` application should be a scheduled job such as a [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) in Kubernetes.
+This project is intended to be deployed via Docker with two containers (`collector` and `reporter`) and a shared volume for the backing database. The the `collector` application should be a scheduled job such as a [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) in Kubernetes.
 
 ### Setup
 
 #### Configuration
 
-Populate a the configuration yaml file ([example](/config.example.yml) with the credentials required for the metrics you are interested in collecting.
+Populate a the configuration yaml file ([example](/config.example.yml)) with the credentials required for the metrics you are interested in collecting.
 
 * Goodreads - create a Developer Key [here](https://www.goodreads.com/api/keys)
 * Fitbit - register your application [here](https://dev.fitbit.com/apps/new)
