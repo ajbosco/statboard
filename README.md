@@ -5,13 +5,13 @@
 
 Personal dashboard and metrics collector
 
-![screenshot](/img/screenshot.png)
-
 - [Supported Metrics](#supported-metrics)
 - [Deployment](#deployment)
 - [Setup](#setup)
   * [Configuration](#configuration)
   * [Environment Variables](#environment-variables)
+
+![screenshot](/img/screenshot_v1.png)
 
 ### Supported Metrics
 
