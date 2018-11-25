@@ -2,6 +2,10 @@
 NAME := reads
 PKG := github.com/ajbosco/reads/cmd/reads
 
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
 .PHONY: fmt
 fmt: ## Verifies all files have been `gofmt`ed.
 	@gofmt -s -l . | grep -v vendor | tee /dev/stderr
@@ -17,7 +21,3 @@ test: ## Runs the go tests.
 .PHONY: vet
 vet: ## Verifies `go vet` passes.
 	@go vet $(shell go list ./... | grep -v vendor) | tee /dev/stderr
-
-.PHONY: help
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/^[^:]*://g' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
