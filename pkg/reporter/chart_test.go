@@ -66,6 +66,13 @@ func TestChartGetChart(t *testing.T) {
 		ChartType: "line",
 		Options: &chartjs.Options{
 			Scales: chartjs.Scales{
+				YAxes: []chartjs.Axes{
+					{
+						Ticks: &chartjs.Ticks{
+							BeginAtZero: true,
+						},
+					},
+				},
 				XAxes: []chartjs.Axes{
 					{
 						Time: &chartjs.Time{

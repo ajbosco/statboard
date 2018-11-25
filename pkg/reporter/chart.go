@@ -75,6 +75,13 @@ func getChart(chartData []chartjs.Point, metricName string, chartColor string) c
 		Options: &chartjs.Options{
 
 			Scales: chartjs.Scales{
+				YAxes: []chartjs.Axes{
+					{
+						Ticks: &chartjs.Ticks{
+							BeginAtZero: true,
+						},
+					},
+				},
 				XAxes: []chartjs.Axes{
 					{
 						Time: &chartjs.Time{
