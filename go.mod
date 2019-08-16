@@ -18,7 +18,7 @@ require (
 	github.com/sajal/fitbitclient v0.0.0-20160707181904-9e74ca7630a5
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.4.0
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/vmihailenco/msgpack v4.0.1+incompatible // indirect
 	go.etcd.io/bbolt v1.3.0 // indirect
 	golang.org/x/net v0.0.0-20181017193950-04a2e542c03f // indirect
