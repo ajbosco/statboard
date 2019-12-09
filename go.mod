@@ -17,7 +17,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/sajal/fitbitclient v0.0.0-20160707181904-9e74ca7630a5
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.4.0
 	github.com/vmihailenco/msgpack v4.0.1+incompatible // indirect
 	go.etcd.io/bbolt v1.3.0 // indirect
