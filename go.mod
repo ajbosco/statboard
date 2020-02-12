@@ -12,7 +12,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/mux v1.7.4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.8.1
 	github.com/sajal/fitbitclient v0.0.0-20160707181904-9e74ca7630a5
