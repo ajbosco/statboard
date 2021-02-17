@@ -16,15 +16,12 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.8.1
 	github.com/sajal/fitbitclient v0.0.0-20160707181904-9e74ca7630a5
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.7.1
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.4.0
 	github.com/vmihailenco/msgpack v4.0.1+incompatible // indirect
-	go.etcd.io/bbolt v1.3.0 // indirect
-	golang.org/x/net v0.0.0-20181017193950-04a2e542c03f // indirect
 	golang.org/x/oauth2 v0.0.0-20181017192945-9dcd33a902f4
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f // indirect
 	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/go-playground/colors.v1 v1.2.0
-	gopkg.in/yaml.v2 v2.2.1
+	gopkg.in/yaml.v2 v2.2.2
 )
